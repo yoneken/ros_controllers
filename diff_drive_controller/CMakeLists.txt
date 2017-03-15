@@ -4,6 +4,7 @@ project(diff_drive_controller)
 find_package(catkin REQUIRED COMPONENTS
     controller_interface
     nav_msgs
+    sensor_msgs
     realtime_tools
     tf
     urdf

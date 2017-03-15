@@ -46,6 +46,8 @@
 
 #include <boost/assign.hpp>
 
+#include <sensor_msgs/Imu.h>
+
 #include <diff_drive_controller/diff_drive_controller.h>
 
 static double euclideanOfVectors(const urdf::Vector3& vec1, const urdf::Vector3& vec2)
@@ -117,6 +119,7 @@ namespace diff_drive_controller{
     , wheel_separation_multiplier_(1.0)
     , wheel_radius_multiplier_(1.0)
     , cmd_vel_timeout_(0.5)
+    , yaw_imu_(0.0)
     , base_frame_id_("base_link")
     , enable_odom_tf_(true)
     , wheel_joints_size_(0)
@@ -245,6 +248,7 @@ namespace diff_drive_controller{
     }
 
     sub_command_ = controller_nh.subscribe("cmd_vel", 1, &DiffDriveController::cmdVelCallback, this);
+    sub_imu_ = controller_nh.subscribe("imu", 1, &DiffDriveController::imuCallback, this);
 
     return true;
   }
@@ -274,7 +278,7 @@ namespace diff_drive_controller{
       right_pos /= wheel_joints_size_;
 
       // Estimate linear and angular velocity using joint information
-      odometry_.update(left_pos, right_pos, time);
+      odometry_.update(left_pos, right_pos, time, yaw_imu_);
     }
 
     // Publish odometry message
@@ -389,6 +393,11 @@ namespace diff_drive_controller{
     {
       ROS_ERROR_NAMED(name_, "Can't accept new commands. Controller is not running.");
     }
+  }
+
+  void DiffDriveController::imuCallback(const sensor_msgs::Imu& imu)
+  {
+    yaw_imu_ = imu.orientation.z;
   }
 
   bool DiffDriveController::getWheelNames(ros::NodeHandle& controller_nh,

@@ -72,7 +72,7 @@ namespace diff_drive_controller
     timestamp_ = time;
   }
 
-  bool Odometry::update(double left_pos, double right_pos, const ros::Time &time)
+  bool Odometry::update(double left_pos, double right_pos, const ros::Time &time, double yaw)
   {
     /// Get current wheel joint positions:
     const double left_wheel_cur_pos  = left_pos  * wheel_radius_;
@@ -88,7 +88,8 @@ namespace diff_drive_controller
 
     /// Compute linear and angular diff:
     const double linear  = (right_wheel_est_vel + left_wheel_est_vel) * 0.5 ;
-    const double angular = (right_wheel_est_vel - left_wheel_est_vel) / wheel_separation_;
+    // const double angular = (right_wheel_est_vel - left_wheel_est_vel) / wheel_separation_;
+    const double angular = yaw;
 
     /// Integrate odometry:
     integrate_fun_(linear, angular);
