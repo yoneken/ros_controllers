@@ -119,6 +119,7 @@ namespace diff_drive_controller{
     realtime_tools::RealtimeBuffer<Commands> command_;
     Commands command_struct_;
     ros::Subscriber sub_command_;
+    ros::Subscriber sub_imu_;
 
     /// Odometry related:
     boost::shared_ptr<realtime_tools::RealtimePublisher<nav_msgs::Odometry> > odom_pub_;
@@ -137,6 +138,9 @@ namespace diff_drive_controller{
 
     /// Timeout to consider cmd_vel commands old:
     double cmd_vel_timeout_;
+
+    /// Yaw from IMU
+    double yaw_imu_;
 
     /// Frame to use for the robot base:
     std::string base_frame_id_;
@@ -164,6 +168,8 @@ namespace diff_drive_controller{
      * \param command Velocity command message (twist)
      */
     void cmdVelCallback(const geometry_msgs::Twist& command);
+
+    void imuCallback(const sensor_msgs::Imu& imu);
 
     /**
      * \brief Get the wheel names from a wheel param
