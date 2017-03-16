@@ -99,6 +99,7 @@ namespace diff_drive_controller{
     std::string name_;
 
     /// Odometry related:
+    double publish_rate_;
     ros::Duration publish_period_;
     ros::Time last_state_publish_time_;
     bool open_loop_;

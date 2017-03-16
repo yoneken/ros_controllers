@@ -42,6 +42,7 @@
 #include <diff_drive_controller/odometry.h>
 
 #include <boost/bind.hpp>
+#include <boost/math/constants/constants.hpp>
 
 namespace diff_drive_controller
 {
@@ -88,8 +89,10 @@ namespace diff_drive_controller
 
     /// Compute linear and angular diff:
     const double linear  = (right_wheel_est_vel + left_wheel_est_vel) * 0.5 ;
-    // const double angular = (right_wheel_est_vel - left_wheel_est_vel) / wheel_separation_;
-    const double angular = yaw;
+    //const double angular = (right_wheel_est_vel - left_wheel_est_vel) / wheel_separation_;
+
+    const double pi = boost::math::constants::pi<double>();
+    const double angular = yaw / 2. - 0.00009;
 
     /// Integrate odometry:
     integrate_fun_(linear, angular);
