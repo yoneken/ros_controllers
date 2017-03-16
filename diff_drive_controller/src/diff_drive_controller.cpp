@@ -158,11 +158,15 @@ namespace diff_drive_controller{
     }
 
     // Odometry related:
-    double publish_rate;
-    controller_nh.param("publish_rate", publish_rate, 50.0);
+    //double publish_rate;
+    //controller_nh.param("publish_rate", publish_rate, 50.0);
+    //ROS_INFO_STREAM_NAMED(name_, "Controller state will be published at "
+    //                      << publish_rate << "Hz.");
+    //publish_period_ = ros::Duration(1.0 / publish_rate);
+    controller_nh.param("publish_rate", publish_rate_, 50.0);
     ROS_INFO_STREAM_NAMED(name_, "Controller state will be published at "
-                          << publish_rate << "Hz.");
-    publish_period_ = ros::Duration(1.0 / publish_rate);
+                          << publish_rate_ << "Hz.");
+    publish_period_ = ros::Duration(1.0 / publish_rate_);
 
     controller_nh.param("open_loop", open_loop_, open_loop_);
 
@@ -278,7 +282,7 @@ namespace diff_drive_controller{
       right_pos /= wheel_joints_size_;
 
       // Estimate linear and angular velocity using joint information
-      odometry_.update(left_pos, right_pos, time, yaw_imu_);
+      odometry_.update(left_pos, right_pos, time, yaw_imu_ / publish_rate_);
     }
 
     // Publish odometry message
@@ -397,7 +401,7 @@ namespace diff_drive_controller{
 
   void DiffDriveController::imuCallback(const sensor_msgs::Imu& imu)
   {
-    yaw_imu_ = imu.orientation.z;
+    yaw_imu_ = imu.angular_velocity.z;
   }
 
   bool DiffDriveController::getWheelNames(ros::NodeHandle& controller_nh,
