@@ -121,6 +121,7 @@ namespace diff_drive_controller{
     Commands command_struct_;
     ros::Subscriber sub_command_;
     ros::Subscriber sub_imu_;
+    ros::Subscriber sub_yaw_add_;
 
     /// Odometry related:
     boost::shared_ptr<realtime_tools::RealtimePublisher<nav_msgs::Odometry> > odom_pub_;
@@ -142,6 +143,9 @@ namespace diff_drive_controller{
 
     /// Yaw from IMU
     double yaw_imu_;
+
+    /// additional Yaw for stabilizer
+    double yaw_add_;
 
     /// Frame to use for the robot base:
     std::string base_frame_id_;
@@ -171,6 +175,7 @@ namespace diff_drive_controller{
     void cmdVelCallback(const geometry_msgs::Twist& command);
 
     void imuCallback(const sensor_msgs::Imu& imu);
+    void addYawCallback(const std_msgs::Float64& yaw_add);
 
     /**
      * \brief Get the wheel names from a wheel param

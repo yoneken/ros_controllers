@@ -47,6 +47,7 @@
 #include <boost/assign.hpp>
 
 #include <sensor_msgs/Imu.h>
+#include <std_msgs/Float64.h>
 
 #include <diff_drive_controller/diff_drive_controller.h>
 
@@ -120,6 +121,7 @@ namespace diff_drive_controller{
     , wheel_radius_multiplier_(1.0)
     , cmd_vel_timeout_(0.5)
     , yaw_imu_(0.0)
+    , yaw_add_(0.0)
     , base_frame_id_("base_link")
     , enable_odom_tf_(true)
     , wheel_joints_size_(0)
@@ -253,6 +255,7 @@ namespace diff_drive_controller{
 
     sub_command_ = controller_nh.subscribe("cmd_vel", 1, &DiffDriveController::cmdVelCallback, this);
     sub_imu_ = controller_nh.subscribe("imu", 1, &DiffDriveController::imuCallback, this);
+    sub_yaw_add_ = controller_nh.subscribe("yaw_additional", 1, &DiffDriveController::addYawCallback, this);
 
     return true;
   }
@@ -321,6 +324,10 @@ namespace diff_drive_controller{
     // Retreive current velocity command and time step:
     Commands curr_cmd = *(command_.readFromRT());
     const double dt = (time - curr_cmd.stamp).toSec();
+
+    // Additional Yaw for stabilize
+    curr_cmd.ang += yaw_add_;
+    //ROS_WARN("yaw: %.2f, %.2f", yaw_add_, curr_cmd.ang);
 
     // Brake if cmd_vel has timeout:
     if (dt > cmd_vel_timeout_)
@@ -401,7 +408,12 @@ namespace diff_drive_controller{
 
   void DiffDriveController::imuCallback(const sensor_msgs::Imu& imu)
   {
-    yaw_imu_ = imu.angular_velocity.z;
+    yaw_imu_ = imu.angular_velocity.z - 0.05;
+  }
+
+  void DiffDriveController::addYawCallback(const std_msgs::Float64& yaw_add)
+  {
+    yaw_add_ = yaw_add.data;
   }
 
   bool DiffDriveController::getWheelNames(ros::NodeHandle& controller_nh,
