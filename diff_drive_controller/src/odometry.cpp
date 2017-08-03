@@ -92,7 +92,7 @@ namespace diff_drive_controller
     //const double angular = (right_wheel_est_vel - left_wheel_est_vel) / wheel_separation_;
 
     const double pi = boost::math::constants::pi<double>();
-    const double angular = yaw / 2. - 0.00009;
+    const double angular = yaw / 2.;
 
     /// Integrate odometry:
     integrate_fun_(linear, angular);

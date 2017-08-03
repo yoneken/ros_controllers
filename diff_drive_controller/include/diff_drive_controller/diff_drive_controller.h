@@ -42,6 +42,7 @@
 
 #include <nav_msgs/Odometry.h>
 #include <tf/tfMessage.h>
+#include <tf/transform_listener.h>
 
 #include <realtime_tools/realtime_buffer.h>
 #include <realtime_tools/realtime_publisher.h>
@@ -121,6 +122,8 @@ namespace diff_drive_controller{
     Commands command_struct_;
     ros::Subscriber sub_command_;
     ros::Subscriber sub_imu_;
+
+    tf::TransformListener tflistener_;
 
     /// Odometry related:
     boost::shared_ptr<realtime_tools::RealtimePublisher<nav_msgs::Odometry> > odom_pub_;

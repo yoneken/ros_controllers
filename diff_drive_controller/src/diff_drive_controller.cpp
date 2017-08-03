@@ -47,6 +47,7 @@
 #include <boost/assign.hpp>
 
 #include <sensor_msgs/Imu.h>
+#include <geometry_msgs/Vector3Stamped.h>
 
 #include <diff_drive_controller/diff_drive_controller.h>
 
@@ -114,6 +115,7 @@ namespace diff_drive_controller{
   DiffDriveController::DiffDriveController()
     : open_loop_(false)
     , command_struct_()
+    , tflistener_()
     , wheel_separation_(0.0)
     , wheel_radius_(0.0)
     , wheel_separation_multiplier_(1.0)
@@ -401,7 +403,19 @@ namespace diff_drive_controller{
 
   void DiffDriveController::imuCallback(const sensor_msgs::Imu& imu)
   {
-    yaw_imu_ = imu.angular_velocity.z;
+    sensor_msgs::Imu imu_out;
+    geometry_msgs::Vector3Stamped v3_in, v3_out;
+
+    v3_in.header = imu.header;
+    v3_in.vector = imu.angular_velocity;
+    v3_out.header = imu.header;
+
+    try{
+      tflistener_.waitForTransform(imu.header.frame_id, "/base_link", imu.header.stamp, ros::Duration(1.0));
+      tflistener_.transformVector("/base_link", v3_in, v3_out);
+      yaw_imu_ = v3_out.vector.z;
+    }catch(tf::TransformException ex){
+    }
   }
 
   bool DiffDriveController::getWheelNames(ros::NodeHandle& controller_nh,
